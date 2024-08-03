@@ -1,4 +1,4 @@
-from main import binpacking_compact
+from compact import binpacking_compact
 
 
 def random_bin_packing_instance(
@@ -19,6 +19,3 @@ def test_random_bin_packing_instance():
     model = binpacking_compact(sizes, capacity)
     
     model.optimize()
-    
-    
-test_random_bin_packing_instance()
