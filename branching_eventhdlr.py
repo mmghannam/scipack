@@ -19,16 +19,9 @@ class RyanFosterBranchingEventhdlr(scip.Eventhdlr):
                 intersection = pattern.intersection(set(pair))
                 if len(intersection) == 2:
                     self.model.chgVarUb(var, 0)
-                    # self.model.fixVar(var, 0)
-                    self.model.addCons(var == 0, local=True)
-                    # assert(self.model.getUbLocal(var) == 0)
             
             for pair in together:
                 intersection = pattern.intersection(set(pair))
                 if len(intersection) == 1:
                     self.model.chgVarUb(var, 0)
-                    # self.model.fixVar(var, 0)
-                    # self.model.chgVarUb(var, 0)
-                    self.model.addCons(var == 0, local=True)
-                    # assert(var.getUbLocal() == 0)
                     
