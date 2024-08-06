@@ -50,6 +50,7 @@ if __name__ == "__main__":
     model, vars, constraints = extended_binpacking(sizes, capacity)
 
     # model.setParam("limits/nodes", 1)
+    model.setParam("display/freq", 1) # show the output log after each node
     model.redirectOutput()
     model.optimize()
     
