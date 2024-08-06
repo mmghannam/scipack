@@ -13,7 +13,7 @@ def extended_binpacking(sizes: List[int], capacity: int):
 
     model.setPresolve(SCIP_PARAMSETTING.OFF)
     model.setSeparating(SCIP_PARAMSETTING.OFF)
-    model.setHeuristics(SCIP_PARAMSETTING.OFF)
+    # model.setHeuristics(SCIP_PARAMSETTING.OFF)
 
     x = {}
     # create one item per bin variables
