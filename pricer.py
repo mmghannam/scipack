@@ -9,10 +9,11 @@ class KnapsackPricer(Pricer):
         self.constraints = constraints
         self.branching_decisions = branching_decisions
         self.i = 0
-        
-    def pricerredcost(self):
-        self.i += 1
-        
+    
+    def price(self, farkas):    
+        if farkas:
+            print("Farkas pricing")
+            
         branching_decisions = self.branching_decisions[self.model.getCurrentNode().getNumber()]
         
         if self.i % 10 == 0:
@@ -21,23 +22,19 @@ class KnapsackPricer(Pricer):
         dual_sol = {}
         for (cons_id, cons) in self.constraints.items():
             cons = self.model.getTransformedCons(cons)
-            dual_sol[cons_id] = self.model.getDualsolLinear(cons)   
+            if farkas:
+                dual_sol[cons_id] = self.model.getDualfarkasLinear(cons)
+            else:
+                dual_sol[cons_id] = self.model.getDualsolLinear(cons)   
+                
         
-        # sum_duals = 0
-        # for cons in self.model.getConss():
-        #     cons = self.model.getTransformedCons(cons)
-        #     print(cons, self.model.getDualsolLinear(cons))
-        #     sum_duals += self.model.getDualsolLinear(cons)
-        
-        
-        # offset_from_branching_cons = sum_duals - sum(dual_sol.values())
-        # assert(offset_from_branching_cons < 1e-6)            
-        
-        # print("dual solution", dual_sol)
         min_red_cost, pattern = pricing_solver(self.sizes, self.capacity, dual_sol, branching_decisions["together"], branching_decisions["apart"])
         # print("min_red_cost", min_red_cost)
         # print("pattern", pattern)            
         
+        if farkas:
+            # remove the obj. function coefficient (farkas pricing requires the obj. function to be 0)
+            min_red_cost -= 1 
         
         bound = - self.model.infinity()                    
         if min_red_cost < 0:
@@ -48,10 +45,21 @@ class KnapsackPricer(Pricer):
                 item_constraint = self.model.getTransformedCons(item_constraint)
                 self.model.addConsCoeff(item_constraint, new_var, 1)
         else:
-            bound = math.ceil(self.model.getLPObjVal())
+            if not farkas:
+                bound = math.ceil(self.model.getLPObjVal())
         
         
         return {
             'result': SCIP_RESULT.SUCCESS,
             'lowerbound': bound
             }
+        
+    def pricerredcost(self):
+        self.i += 1
+        return self.price(farkas=False)
+    
+    def pricerfarkas(self):
+        self.i += 1
+        return self.price(farkas=True)
+        
+        
